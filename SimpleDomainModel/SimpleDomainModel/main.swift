@@ -97,55 +97,83 @@ open class Job {
   }
 }
 
-////////////////////////////////////////
-////// Person
-//////
-//open class Person {
-//  open var firstName : String = ""
-//  open var lastName : String = ""
-//  open var age : Int = 0
-//
-//  fileprivate var _job : Job? = nil
-//  open var job : Job? {
-//    get { }
-//    set(value) {
-//    }
-//  }
-//
-//  fileprivate var _spouse : Person? = nil
-//  open var spouse : Person? {
-//    get { }
-//    set(value) {
-//    }
-//  }
-//
-//  public init(firstName : String, lastName: String, age : Int) {
-//    self.firstName = firstName
-//    self.lastName = lastName
-//    self.age = age
-//  }
-//
-//  open func toString() -> String {
-//  }
-//}
-//
-////////////////////////////////////////
-////// Family
-//////
-//open class Family {
-//  fileprivate var members : [Person] = []
-//
-//  public init(spouse1: Person, spouse2: Person) {
-//  }
-//
-//  open func haveChild(_ child: Person) -> Bool {
-//  }
-//
-//  open func householdIncome() -> Int {
-//  }
-//}
+//////////////////////////////////////
+//// Person
+////
+open class Person {
+  open var firstName : String = ""
+  open var lastName : String = ""
+  open var age : Int = 0
 
+  fileprivate var _job : Job? = nil
+  open var job : Job? {
+    get {return _job}
+    set(value) {
+        if self.age >= 16 {
+            _job = value
+        }
+    }
+  }
 
+  fileprivate var _spouse : Person? = nil
+  open var spouse : Person? {
+    get {return _spouse}
+    set(value) {
+        if self.age >= 18 {
+            _spouse = value
+        }
+    }
+  }
+
+  public init(firstName : String, lastName: String, age : Int) {
+    self.firstName = firstName
+    self.lastName = lastName
+    self.age = age
+  }
+
+  open func toString() -> String {
+    return "[Person: firstName:\(self.firstName) lastName:\(self.lastName) age:\(self.age) job:\(_job) spouse:\(_spouse)]"
+  }
+}
+
+////////////////////////////////////
+// Family
+//
+open class Family {
+  fileprivate var members : [Person] = []
+
+  public init(spouse1: Person, spouse2: Person) {
+    if spouse1.spouse == nil && spouse2.spouse == nil {
+        spouse1.spouse = spouse2
+        spouse2.spouse = spouse1
+        self.members.append(spouse1)
+        self.members.append(spouse2)
+    }
+  }
+
+  open func haveChild(_ child: Person) -> Bool {
+    if self.members[0].age >= 21 || self.members[1].age >= 21 {
+        self.members.append(child)
+        return true
+    }
+    return false
+  }
+
+  open func householdIncome() -> Int {
+    var totalIncome = 0
+    for m in members{
+        if m.job != nil {
+            switch m.job!.type {
+            case .Hourly(let wage):
+                totalIncome = totalIncome + Int(wage * Double(2000))
+            case .Salary(let sal):
+                totalIncome = totalIncome + sal
+            }
+        }
+    }
+    return totalIncome
+}
+}
 
 
 
